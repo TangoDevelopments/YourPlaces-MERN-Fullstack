@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
@@ -36,7 +37,7 @@ const getPlacesByUserId = async (req, res, next) => {
 
   let userWithPlaces;
   try {
-    userwithPlaces = await User.findById(userId).populate('places')
+    userwithPlaces = await User.findById(userId).populate("places");
   } catch (err) {
     const error = new HttpError(
       "Fetching places failed, please try again later",
@@ -52,7 +53,9 @@ const getPlacesByUserId = async (req, res, next) => {
   }
 
   res.json({
-    places: userwithPlaces.places.map((place) => place.toObject({ getters: true })),
+    places: userwithPlaces.places.map((place) =>
+      place.toObject({ getters: true })
+    ),
   });
 };
 
@@ -78,8 +81,7 @@ const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/400px-Empire_State_Building_%28aerial_view%29.jpg",
+    image: req.file.path,
     creator,
   });
 
@@ -174,13 +176,15 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = place.image;
+
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await place.remove({ session: sess });
     place.creator.places.pull(place);
     await place.creator.save({ session: sess });
-    await sess.commitTransaction()
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete place.",
@@ -188,6 +192,10 @@ const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
 
   res.status(200).json({ message: "Deleted place." });
 };

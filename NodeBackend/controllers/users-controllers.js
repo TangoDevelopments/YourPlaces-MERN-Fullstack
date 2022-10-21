@@ -21,6 +21,7 @@ const signup = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
+
     return next(
       new HttpError("Invalid inputs passed. Please check your data", 422)
     );
@@ -50,8 +51,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image:
-      "https://www.travelandleisure.com/thmb/xyyOmec2yAqPGBcN-Y2FLfFadu0=/1600x1000/filters:fill(auto,1)/eiffel-tower-paris-france-EIFFEL0217-6ccc3553e98946f18c893018d5b42bde.jpg",
+    image: req.file.path,
     password,
     places: [],
   });
