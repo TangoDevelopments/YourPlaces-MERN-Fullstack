@@ -1,0 +1,9 @@
+{
+    "env": {
+        "DB_USER": "Andrew",
+        "DB_PASSWORD": "mernstack",
+        "DB_NAME": "mern",
+        "GOOGLE_API_KEY": "AIzaSyBr1jvOLd25Y1e9oUuu2iBBMmZwm3KDGcw",
+        "JWT_KEY": "supersecret_dont_share"
+    }
+}
